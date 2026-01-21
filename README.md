@@ -84,32 +84,7 @@ When connecting to multiple SAP systems (DEV, SBX, etc.), deploy separate contai
 
 For multi-system configuration, see [Multiple SAP Systems Configuration](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer#multiple-sap-systems-configuration).
 
-### 2.3 Tool Design Patterns
-
-**Principle**: Follow consistent naming and schema conventions for MCP tools.
-
-#### Naming Convention
-
-Use hierarchical snake_case: `{vendor}_{domain}_{action}_{object}`
-
-| Example | Purpose |
-|---------|---------|
-| `aws_abap_cb_connection_status` | Verify SAP connection |
-| `aws_abap_cb_search_object` | Search ABAP objects |
-| `aws_abap_cb_get_source` | Retrieve source code |
-| `aws_abap_cb_run_atc_check` | Execute ATC checks |
-
-#### Schema Requirements
-
-Tool definitions should include:
-- Clear description of purpose and parameters
-- Input schema with type validation and patterns
-- Output schema documenting response structure
-- Required vs optional parameter designation
-
-For the MCP specification, see [Model Context Protocol Documentation](https://modelcontextprotocol.io/).
-
-### 2.4 Error Handling
+### 2.3 Error Handling
 
 **Principle**: Use a two-tier error model distinguishing protocol errors from business errors.
 
@@ -120,7 +95,7 @@ For the MCP specification, see [Model Context Protocol Documentation](https://mo
 
 Protocol errors indicate problems with the request itself. Execution errors indicate the request was valid but the operation failed (e.g., object locked, insufficient authorization).
 
-### 2.5 Response Format
+### 2.4 Response Format
 
 **Principle**: Return both human-readable text and structured data.
 
