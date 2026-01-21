@@ -335,6 +335,8 @@ When deploying SAP MCP servers on AWS:
 | C | Conditionally Clean | Uses APIs with planned successors | Plan migration path |
 | D | Not Clean | Uses deprecated or internal APIs | Remediation required |
 
+For Clean Core concepts and extensibility patterns, see [SAP Clean Core Extensibility White Paper](https://www.sap.com/documents/2024/09/20aece06-d87e-0010-bca6-c68f7e60039b.html).
+
 ### Appendix B: MCP Tool Reference
 
 Standard tools provided by SAP ABAP Accelerator:
