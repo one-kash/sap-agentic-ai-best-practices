@@ -7,9 +7,9 @@ Best practices for implementing AI-assisted SAP development using Model Context 
 ## Table of Contents
 
 1. [Introduction](#1-introduction)
-2. [Security Best Practices](#2-security-best-practices)
-3. [MCP Server Best Practices](#3-mcp-server-best-practices)
-4. [Agent Workflow Best Practices](#4-agent-workflow-best-practices)
+2. [MCP Best Practices for ABAP Accelerator](#2-mcp-best-practices-for-abap-accelerator)
+3. [Kiro-CLI Best Practices for Clean Core Agents](#3-kiro-cli-best-practices-for-clean-core-agents)
+4. [Security Best Practices](#4-security-best-practices)
 5. [Operational Best Practices](#5-operational-best-practices)
 6. [AWS Deployment Considerations](#6-aws-deployment-considerations)
 7. [Appendices](#7-appendices)
@@ -20,7 +20,7 @@ Best practices for implementing AI-assisted SAP development using Model Context 
 
 ### 1.1 Scope
 
-This document provides best practices for organizations implementing AI-assisted SAP development workflows. It covers security, operations, and architectural patterns without duplicating setup instructions available in referenced documentation.
+This document provides best practices for organizations implementing AI-assisted SAP development workflows. It covers architectural patterns, agent design, security, and operations without duplicating setup instructions available in referenced documentation.
 
 ### 1.2 Target Audience
 
@@ -56,92 +56,13 @@ The practices in this document apply to SAP AI workflows such as:
 
 ---
 
-## 2. Security Best Practices
+## 2. MCP Best Practices for ABAP Accelerator
 
-### 2.1 Environment Restrictions
-
-**Principle**: Restrict AI-assisted operations to non-production systems.
-
-| Environment | AI Access | Rationale |
-|-------------|-----------|-----------|
-| Development (DEV) | Permitted | Safe for experimentation |
-| Sandbox (SBX) | Permitted | Isolated testing |
-| Training (TRN) | Permitted | Educational use |
-| Quality (QAS) | Not Permitted | Pre-production data |
-| Production (PRD) | Not Permitted | Business critical |
-
-This restriction exists because AI agents can read source code, execute ATC checks, and generate documentation. These operations should not occur against production systems or data.
-
-### 2.2 Credential Management
-
-**Principle**: Never store credentials in configuration files, environment variables, or version control.
-
-#### Recommended Patterns
-
-| Deployment | Credential Storage | Reference |
-|------------|-------------------|-----------|
-| Local Development | Docker secrets with bind mounts | [SAP ABAP Accelerator - Password Configuration](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer#step-3-configure-sap-password) |
-| AWS Cloud | AWS Secrets Manager or Cognito | [AWS MCP Guidance - Security](https://aws.amazon.com/solutions/guidance/deploying-model-context-protocol-servers-on-aws/) |
-
-#### Key Practices
-
-- Store passwords in dedicated secret files with restricted permissions (600)
-- Mount secrets as read-only into containers
-- Use secure password entry methods that avoid shell history
-- Rotate credentials on a defined schedule
-- Never commit secrets directories to version control
-
-### 2.3 Network Security
-
-**Principle**: Minimize network exposure of MCP servers.
-
-#### Transport Selection
-
-| Transport | Use Case | Exposure |
-|-----------|----------|----------|
-| stdio | Local agent deployments | None (stdin/stdout only) |
-| HTTP | Remote or multi-client | Requires authentication and TLS |
-
-For local deployments using Kiro-CLI, stdio transport is preferred. The MCP server runs as a subprocess with no network ports exposed.
-
-For HTTP transport (multi-client scenarios), implement:
-- Origin header validation
-- Localhost binding (127.0.0.1, not 0.0.0.0)
-- TLS encryption
-- Authentication (OAuth 2.0 recommended for cloud deployments)
-
-### 2.4 Input Validation
-
-**Principle**: Validate all inputs before SAP system interaction.
-
-MCP servers should validate:
-- Object names match expected patterns (Z*, Y* for custom code)
-- Package names exist and are accessible
-- Parameters are free from injection attempts
-- Request rates are within acceptable limits
-
-### 2.5 Audit and Logging
-
-**Principle**: Maintain audit trails for all SAP interactions.
-
-Log entries should capture:
-- Timestamp
-- User or agent identity
-- Tool invoked
-- SAP object accessed
-- Operation result (success/failure)
-
-For cloud deployments, centralize logs using AWS CloudWatch or equivalent. See [AWS MCP Guidance](https://aws.amazon.com/solutions/guidance/deploying-model-context-protocol-servers-on-aws/) for CloudWatch integration patterns.
-
----
-
-## 3. MCP Server Best Practices
-
-### 3.1 Container Deployment
+### 2.1 Container Deployment
 
 **Principle**: Deploy MCP servers as containerized applications with explicit resource constraints.
 
-#### Key Practices
+Key practices:
 
 - Use specific image version tags; avoid `latest`
 - Apply memory and CPU limits appropriate to workload
@@ -150,7 +71,7 @@ For cloud deployments, centralize logs using AWS CloudWatch or equivalent. See [
 
 For container setup instructions, see [SAP ABAP Accelerator Setup Guide](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer).
 
-### 3.2 Multi-System Architecture
+### 2.2 Multi-System Architecture
 
 **Principle**: Use separate MCP server instances per SAP system.
 
@@ -163,7 +84,7 @@ When connecting to multiple SAP systems (DEV, SBX, etc.), deploy separate contai
 
 For multi-system configuration, see [Multiple SAP Systems Configuration](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer#multiple-sap-systems-configuration).
 
-### 3.3 Tool Design Patterns
+### 2.3 Tool Design Patterns
 
 **Principle**: Follow consistent naming and schema conventions for MCP tools.
 
@@ -188,7 +109,7 @@ Tool definitions should include:
 
 For the MCP specification, see [Model Context Protocol Documentation](https://modelcontextprotocol.io/).
 
-### 3.4 Error Handling
+### 2.4 Error Handling
 
 **Principle**: Use a two-tier error model distinguishing protocol errors from business errors.
 
@@ -199,7 +120,7 @@ For the MCP specification, see [Model Context Protocol Documentation](https://mo
 
 Protocol errors indicate problems with the request itself. Execution errors indicate the request was valid but the operation failed (e.g., object locked, insufficient authorization).
 
-### 3.5 Response Format
+### 2.5 Response Format
 
 **Principle**: Return both human-readable text and structured data.
 
@@ -211,9 +132,9 @@ This dual format ensures compatibility with different AI clients and enables bot
 
 ---
 
-## 4. Agent Workflow Best Practices
+## 3. Kiro-CLI Best Practices for Clean Core Agents
 
-### 4.1 Three-Phase Workflow Pattern
+### 3.1 Three-Phase Workflow Pattern
 
 **Principle**: Structure agent workflows in three distinct phases with clear gates.
 
@@ -241,7 +162,7 @@ This pattern enables crash recovery, progress visibility, and clean separation o
 
 For agent configuration, see [Kiro Custom Agents Documentation](https://kiro.dev/docs/cli/custom-agents/).
 
-### 4.2 Progress Tracking
+### 3.2 Progress Tracking
 
 **Principle**: Maintain persistent progress state for crash recovery.
 
@@ -253,7 +174,7 @@ Progress tracking should capture:
 
 Store progress in a JSON file that survives agent restarts. Update after each batch checkpoint, not after each individual object.
 
-### 4.3 Crash Recovery
+### 3.3 Crash Recovery
 
 **Principle**: Design agents to resume gracefully after interruption.
 
@@ -265,7 +186,7 @@ On resume, perform validation checks:
 
 Agents should handle context compaction (long-running sessions where older context is summarized) by relying on progress files rather than conversation history.
 
-### 4.4 Batch Processing
+### 3.4 Batch Processing
 
 **Principle**: Process objects in batches with regular checkpoints.
 
@@ -280,7 +201,7 @@ Tune batch size based on:
 - Object complexity (smaller batches for complex operations)
 - Recovery time tolerance (smaller batches for critical workflows)
 
-### 4.5 Clean Core Assessment Workflow
+### 3.5 Clean Core Assessment Workflow
 
 For SAP Clean Core assessment, the typical workflow is:
 
@@ -297,6 +218,85 @@ For SAP Clean Core assessment, the typical workflow is:
 | D | Not Clean | Uses deprecated or internal APIs |
 
 For Clean Core concepts, see [SAP Clean Core Documentation](https://www.sap.com/products/erp/s4hana-clean-core.html).
+
+---
+
+## 4. Security Best Practices
+
+### 4.1 Environment Restrictions
+
+**Principle**: Restrict AI-assisted operations to non-production systems.
+
+| Environment | AI Access | Rationale |
+|-------------|-----------|-----------|
+| Development (DEV) | Permitted | Safe for experimentation |
+| Sandbox (SBX) | Permitted | Isolated testing |
+| Training (TRN) | Permitted | Educational use |
+| Quality (QAS) | Not Permitted | Pre-production data |
+| Production (PRD) | Not Permitted | Business critical |
+
+This restriction exists because AI agents can read source code, execute ATC checks, and generate documentation. These operations should not occur against production systems or data.
+
+### 4.2 Credential Management
+
+**Principle**: Never store credentials in configuration files, environment variables, or version control.
+
+#### Recommended Patterns
+
+| Deployment | Credential Storage | Reference |
+|------------|-------------------|-----------|
+| Local Development | Docker secrets with bind mounts | [SAP ABAP Accelerator - Password Configuration](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer#step-3-configure-sap-password) |
+| AWS Cloud | AWS Secrets Manager or Cognito | [AWS MCP Guidance - Security](https://aws.amazon.com/solutions/guidance/deploying-model-context-protocol-servers-on-aws/) |
+
+#### Key Practices
+
+- Store passwords in dedicated secret files with restricted permissions (600)
+- Mount secrets as read-only into containers
+- Use secure password entry methods that avoid shell history
+- Rotate credentials on a defined schedule
+- Never commit secrets directories to version control
+
+### 4.3 Network Security
+
+**Principle**: Minimize network exposure of MCP servers.
+
+#### Transport Selection
+
+| Transport | Use Case | Exposure |
+|-----------|----------|----------|
+| stdio | Local agent deployments | None (stdin/stdout only) |
+| HTTP | Remote or multi-client | Requires authentication and TLS |
+
+For local deployments using Kiro-CLI, stdio transport is preferred. The MCP server runs as a subprocess with no network ports exposed.
+
+For HTTP transport (multi-client scenarios), implement:
+- Origin header validation
+- Localhost binding (127.0.0.1, not 0.0.0.0)
+- TLS encryption
+- Authentication (OAuth 2.0 recommended for cloud deployments)
+
+### 4.4 Input Validation
+
+**Principle**: Validate all inputs before SAP system interaction.
+
+MCP servers should validate:
+- Object names match expected patterns (Z*, Y* for custom code)
+- Package names exist and are accessible
+- Parameters are free from injection attempts
+- Request rates are within acceptable limits
+
+### 4.5 Audit and Logging
+
+**Principle**: Maintain audit trails for all SAP interactions.
+
+Log entries should capture:
+- Timestamp
+- User or agent identity
+- Tool invoked
+- SAP object accessed
+- Operation result (success/failure)
+
+For cloud deployments, centralize logs using AWS CloudWatch or equivalent. See [AWS MCP Guidance](https://aws.amazon.com/solutions/guidance/deploying-model-context-protocol-servers-on-aws/) for CloudWatch integration patterns.
 
 ---
 
