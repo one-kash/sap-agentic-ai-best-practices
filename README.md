@@ -41,7 +41,7 @@ This document provides best practices for organizations implementing AI-assisted
 
 ### 1.4 Use Cases
 
-This guidance applies to SAP AI workflows including:
+The practices in this document apply to SAP AI workflows such as:
 
 | Use Case | Description |
 |----------|-------------|
