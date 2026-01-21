@@ -43,10 +43,16 @@ This document provides best practices for organizations implementing AI-assisted
 
 This guidance applies to SAP AI workflows including:
 
-- **Clean Core Assessment**: Automated ATC checks with compliance classification
-- **Custom Code Documentation**: AI-generated documentation for Z/Y objects
-- **Unused Code Discovery**: Runtime analysis using SUSG statistics
-- **Migration Planning**: S/4HANA readiness assessment
+| Use Case | Description |
+|----------|-------------|
+| Clean Core Assessment | Automated ATC checks with compliance classification (A/B/C/D levels) |
+| Custom Code Documentation | AI-generated documentation for Z/Y objects |
+| Custom Code Migration Analysis | S/4HANA readiness assessment using migration analysis data |
+| Unit Test Development | Create or update ABAP unit test classes |
+| Syntax Validation | ABAP syntax checking before activation |
+| Unused Code Discovery | Runtime analysis using SUSG statistics |
+| Code Search and Discovery | Search and list objects across packages |
+| Object Activation | Activate ABAP objects after modifications |
 
 ---
 
@@ -416,16 +422,32 @@ When deploying SAP MCP servers on AWS:
 
 Standard tools provided by SAP ABAP Accelerator:
 
+**Object Management**
+
 | Tool | Purpose |
 |------|---------|
-| `aws_abap_cb_connection_status` | Verify SAP connection |
-| `aws_abap_cb_search_object` | Search ABAP objects |
+| `aws_abap_cb_get_objects` | List ABAP objects in a package |
+| `aws_abap_cb_create_object` | Create new ABAP objects |
 | `aws_abap_cb_get_source` | Retrieve source code |
-| `aws_abap_cb_get_objects` | List package objects |
-| `aws_abap_cb_run_atc_check` | Execute ATC checks |
-| `aws_abap_cb_check_syntax` | Syntax validation |
-| `aws_abap_cb_activate_object` | Activate objects |
-| `aws_abap_cb_run_unit_tests` | Execute unit tests |
+| `aws_abap_cb_update_source` | Update source code |
+| `aws_abap_cb_search_object` | Search for objects |
+
+**Development Tools**
+
+| Tool | Purpose |
+|------|---------|
+| `aws_abap_cb_check_syntax` | ABAP syntax validation |
+| `aws_abap_cb_activate_object` | Activate ABAP objects |
+| `aws_abap_cb_run_unit_tests` | Execute ABAP unit tests |
+| `aws_abap_cb_run_atc_check` | Run ATC checks (supports custom variants) |
+
+**Advanced Features**
+
+| Tool | Purpose |
+|------|---------|
+| `aws_abap_cb_generate_documentation` | Generate documentation in SAP system |
+| `aws_abap_cb_get_migration_analysis` | Custom Code Migration analysis |
+| `aws_abap_cb_create_or_update_test_class` | Create or update unit test classes |
 
 For complete tool documentation, see [SAP ABAP Accelerator](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer#available-mcp-tools).
 
