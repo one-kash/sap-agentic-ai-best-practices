@@ -84,27 +84,6 @@ When connecting to multiple SAP systems (DEV, SBX, etc.), deploy separate contai
 
 For multi-system configuration, see [Multiple SAP Systems Configuration](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer#multiple-sap-systems-configuration).
 
-### 2.3 Error Handling
-
-**Principle**: Use a two-tier error model distinguishing protocol errors from business errors.
-
-| Tier | Type | Use Case |
-|------|------|----------|
-| Protocol Error | JSON-RPC error response | Invalid requests, unknown tools, server failures |
-| Execution Error | Result with `isError: true` | Business logic failures, SAP errors, object not found |
-
-Protocol errors indicate problems with the request itself. Execution errors indicate the request was valid but the operation failed (e.g., object locked, insufficient authorization).
-
-### 2.4 Response Format
-
-**Principle**: Return both human-readable text and structured data.
-
-MCP responses should include:
-- Text content summarizing the result for AI consumption
-- Structured content with typed fields for programmatic processing
-
-This dual format ensures compatibility with different AI clients and enables both conversational and automated workflows.
-
 ---
 
 ## 3. Kiro-CLI Best Practices for Clean Core Agents
@@ -338,6 +317,24 @@ When issues occur:
 5. Test with minimal scope (single object) before batch operations
 
 For detailed troubleshooting, see [SAP ABAP Accelerator Troubleshooting](https://github.com/aws-solutions-library-samples/guidance-for-deploying-sap-abap-accelerator-for-amazon-q-developer#error-handling--troubleshooting).
+
+### 5.6 Understanding MCP Error Responses
+
+MCP servers return two types of errors:
+
+| Error Type | Meaning | Action |
+|------------|---------|--------|
+| Protocol Error | Request itself is invalid (wrong tool name, bad parameters) | Check MCP configuration and tool syntax |
+| Execution Error | Request valid but operation failed (object locked, not found) | Check SAP system state and permissions |
+
+**Common execution errors and resolution:**
+
+| Error Message | Cause | Resolution |
+|---------------|-------|------------|
+| Object not found | Object does not exist or wrong name | Verify object name in SAP |
+| Object locked | Another user editing | Wait or contact user |
+| Authorization failed | Missing SAP permissions | Check user authorizations |
+| Connection timeout | SAP system slow or unreachable | Verify network and SAP availability |
 
 ---
 
