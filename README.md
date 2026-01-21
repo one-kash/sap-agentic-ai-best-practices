@@ -58,6 +58,8 @@ The practices in this document apply to SAP AI workflows such as:
 
 ## 2. MCP Best Practices for ABAP Accelerator
 
+For MCP architecture concepts, see [MCP Architecture Overview](https://modelcontextprotocol.io/docs/concepts/architecture).
+
 ### 2.1 Container Deployment
 
 **Principle**: Deploy MCP servers as containerized applications with explicit resource constraints.
